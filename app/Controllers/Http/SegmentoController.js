@@ -1,5 +1,7 @@
 'use strict'
 
+const Segmento = use('App/Models/Segmento')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,19 +19,10 @@ class SegmentoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
+  async index () {
+    const segmento = Segmento.all()
 
-  /**
-   * Render a form to be used for creating a new segmento.
-   * GET segmentos/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+    return segmento
   }
 
   /**
@@ -40,7 +33,12 @@ class SegmentoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, auth }) {
+    const dados = request.all()
+
+    const segmento = Segmento.create({ usuario_id: auth.user.id, ...dados })
+
+    return segmento
   }
 
   /**
@@ -52,19 +50,10 @@ class SegmentoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
+  async show ({ params }) {
+    const segmento = await Segmento.findOrFail(params.id)
 
-  /**
-   * Render a form to update an existing segmento.
-   * GET segmentos/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+    return segmento
   }
 
   /**
@@ -86,7 +75,14 @@ class SegmentoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, response }) {
+    const segmento = await Segmento.findOrFail(params.id)
+
+    if (segmento.usuario_id !== auth.user.id ){
+      return response.status(401).send({ error: 'Não autorizado' })
+    }
+
+    await segmento.delete()
   }
 }
 

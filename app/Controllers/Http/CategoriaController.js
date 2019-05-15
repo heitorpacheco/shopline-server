@@ -1,5 +1,7 @@
 'use strict'
 
+const Categoria = use('App/Models/Categoria')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
@@ -17,20 +19,12 @@ class CategoriaController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index () {
+      const categoria = Categoria.all()
+
+      return categoria
   }
 
-  /**
-   * Render a form to be used for creating a new categoria.
-   * GET categorias/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
 
   /**
    * Create/save a new categoria.
@@ -40,7 +34,13 @@ class CategoriaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, auth }) {
+    const dados = request.all()
+
+    const categoria = await Categoria.create({usuario_id: auth.user.id, ...dados})
+
+    return categoria
+  
   }
 
   /**
@@ -52,31 +52,12 @@ class CategoriaController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show ({ params }) {
+    const categoria = await Categoria.findOrFail(params.id)
+  
+    return categoria
   }
 
-  /**
-   * Render a form to update an existing categoria.
-   * GET categorias/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update categoria details.
-   * PUT or PATCH categorias/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
-  }
 
   /**
    * Delete a categoria with id.
@@ -86,7 +67,14 @@ class CategoriaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params }) {
+    const categoria = await Categoria.findOrFail(params.id)
+
+    if (categoria.usuario_id !== auth.user.id ){
+      return response.status(401).send({ error: 'Não autorizado' })
+    }
+
+    await categoria.delete()
   }
 }
 

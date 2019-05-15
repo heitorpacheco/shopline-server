@@ -19,7 +19,7 @@ class EmpresaController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
+  async index () {
     const empresas = Empresa.all()
 
     return empresas

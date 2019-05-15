@@ -26,19 +26,6 @@ class AtributoController {
   }
 
   /**
-   * Render a form to be used for creating a new atributo.
-   * GET atributos/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create (request) {
-    
-  }
-
-  /**
    * Create/save a new atributo.
    * POST atributos
    *
@@ -46,10 +33,10 @@ class AtributoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, auth }) {
     const dados = request.all()
 
-    atributos = await Atributo.create(dados)
+    atributos = await Atributo.create({usuario_id: auth.user.id, ...dados})
     
     return atributos
   }
@@ -63,19 +50,10 @@ class AtributoController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
-
-  /**
-   * Render a form to update an existing atributo.
-   * GET atributos/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+  async show ({ params }) {
+    const atributo = await Atributo.findOrFail(params.id)
+  
+    return atributo
   }
 
   /**
@@ -97,7 +75,14 @@ class AtributoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, response }) {
+    const atributo = await Atributo.findOrFail(params.id)
+
+    if (atributo.usuario_id !== auth.user.id ){
+      return response.status(401).send({ error: 'Não autorizado' })
+    }
+
+    await atributo.delete()
   }
 }
 
