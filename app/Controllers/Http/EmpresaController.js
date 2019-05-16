@@ -51,7 +51,10 @@ class EmpresaController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show ({ params }) {
+    const empresas = await Empresa.findOrFail(params.id)
+
+    return empresas
   }
 
 
@@ -74,7 +77,14 @@ class EmpresaController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params }) {
+    const empresas = await Empresa.findOrFail(params.id)
+
+    if (empresas.usuario_id !== auth.user.id ){
+      return response.status(401).send({ error: 'Não autorizado' })
+    }
+
+    await empresas.delete()
   }
 }
 

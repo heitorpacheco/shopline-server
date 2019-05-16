@@ -20,7 +20,7 @@ class ProdutoController {
    * @param {View} ctx.view
    */
   async index () {
-    const produto = Produto.all()
+    const produto = Produto.query().with('imagem').fetch()
 
     return produto
   }
@@ -33,10 +33,17 @@ class ProdutoController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, auth }) {
-    const dados = request.all()
+  async store ({ request }) {
+    const dados = request.only([
+      'nome',
+      'descricao',
+      'valor',
+      'categoria_id',
+      'segmento_id',
+      'empresa_id'
+    ])
 
-    const produto = Produto.create({usuario_id: auth.user.id, ...dados})
+    const produto = Produto.create(dados)
 
     return produto
   }
@@ -51,6 +58,11 @@ class ProdutoController {
    * @param {View} ctx.view
    */
   async show ({ params, request, response, view }) {
+    const produto = await Produto.findOrFail(params.id)
+
+    await produto.load('imagem')
+
+    return produto
   }
 
   /**

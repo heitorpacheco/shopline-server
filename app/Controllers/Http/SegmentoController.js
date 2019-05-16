@@ -65,6 +65,23 @@ class SegmentoController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
+    const segmento = await Segmento.findOrFail(params.id)
+
+    // const data = request.only([
+    //   'title',
+    //   'address',
+    //   'latitude',
+    //   'longitude',
+    //   'price'
+    // ])
+
+    const dados = request.all()
+
+    segmento.merge(dados)
+
+    await segmento.save()
+
+    return segmento
   }
 
   /**

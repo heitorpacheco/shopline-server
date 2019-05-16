@@ -8,7 +8,7 @@ class ImagemSchema extends Schema {
     this.create('imagems', (table) => {
       table.increments()
       table.integer('produto_id').unsigned().references('id').inTable('produtos').notNullable()
-      table.string('caminho', 100).notNullable()
+      table.string('path', 100).notNullable()
       table.boolean('capa').notNullable().defaultTo(false)
       table.timestamps()
     })

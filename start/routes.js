@@ -18,6 +18,9 @@ const Route = use('Route')
 
 Route.post("/cadastroLogin", "AuthController.cadastroLogin");
 Route.post("/login", "AuthController.login");
+Route.get('images/:path', 'ImagemController.show')
+Route.post('produtos/:id/imagens', 'ImagemController.store')
+  .middleware('auth')
 
 Route.group(() => {
 
@@ -30,6 +33,10 @@ Route.group(() => {
         .except('update')
 
     Route.resource('atributos', 'AtributoController')
+        .apiOnly()
+        .except('update')
+    
+    Route.resource('produtos', 'ProdutoController')
         .apiOnly()
         .except('update')
 
